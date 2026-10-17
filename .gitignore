@@ -1,0 +1,51 @@
+# sbt / Scala
+target/
+project/target/
+project/project/
+.bsp/
+
+# editors
+.idea/
+.vscode/
+.metals/
+.bloop/
+# Metals writes this beside `build.properties` to enable sbt-bloop; it is
+# regenerated on demand, so it is output rather than source.
+project/metals.sbt
+# Scala worksheet/script scratch files (`*.sc`); the `.scala` sources are what
+# the build compiles.
+*.sc
+
+# generated Verilog (examples / tests)
+*.v
+*.sv
+*.f
+
+# ...except the checked-in goldens, which are *inputs* to the suites rather
+# than output of them. The golden corpus is read off disk and compared byte for
+# byte by its runner, so a clean checkout without it fails the suite for
+# want of a fixture: ignoring the corpus would hide the fixture rather than the
+# output. There is one corpus, under `core`, holding a golden for every
+# construction the emitter can produce; the examples demonstrate and may be
+# edited, so they are not the emitter's contract and hold no goldens of their
+# own.
+!core/src/test/resources/scalahdl/golden/**
+
+# ...and the same for the testbenches, for the same reason: `tb_skid.sv` is a
+# gate written by hand and read by Verilator, not something the emitter wrote.
+!core/src/test/verilog/**/*.sv
+
+# ...and the same for the wrapper the example oracle compares two implementations
+# through: hand-written Verilog that wires them together, read by Verilator.
+!examples/src/test/resources/scalahdl/verilator/**/*.v
+
+# build output
+generated/
+
+# OS
+.DS_Store
+
+# agent-session tooling: local only
+.claude/
+.roo/
+.zcode/
