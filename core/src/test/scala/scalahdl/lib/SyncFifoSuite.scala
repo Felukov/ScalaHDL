@@ -15,7 +15,7 @@ final class SyncFifoSuite extends munit.FunSuite:
 
   private def emitted(fifo: SyncFifo): String =
     val design = fifo.elaborateDesign()
-    new Emission("0.1.0-SNAPSHOT", Some(Vendor.Xilinx)).emit(design).files.head._2
+    new Emission("0.1.1", Some(Vendor.Xilinx)).emit(design).files.head._2
 
   test("the ports are R8's, named for the endpoints they belong to"):
     val module = (new SyncFifo(8, 8)).elaborate()

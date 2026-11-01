@@ -18,7 +18,7 @@ import scalahdl.examples.{DecodeTable, FetchFsm}
   * syntax of every nesting. The emitted bytes are the emitter's contract,
   * pinned by the `core` corpus. */
 final class SwitchCaseGoldenSuite extends munit.FunSuite:
-  private val version = "0.1.0-SNAPSHOT"
+  private val version = "0.1.1"
 
   private def emit(m: => Module): String =
     new Emission(version).emit(m.elaborateDesign()).files.head._2

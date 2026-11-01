@@ -11,7 +11,7 @@ import scalahdl.examples.SafeClockCrossing
   * Verilog's exact bytes are the emitter's contract and are pinned by the `core`
   * corpus, not here. */
 final class SafeClockCrossingGoldenSuite extends munit.FunSuite:
-  private val version = "0.1.0-SNAPSHOT"
+  private val version = "0.1.1"
   private val generator = "scalahdl.examples.SafeClockCrossing"
 
   private def emitted() =

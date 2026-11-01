@@ -1794,6 +1794,235 @@ side also needs them, adding a member means renumbering by hand, and no diagnost
 `AluOp.Or` because nothing recorded the name. R24 is that idiom with the counter, the name capture,
 and the width folded into one declaration.
 
+### A register map (R40)
+
+A register block is one declaration. It states the block's base address, its word
+width and its address width. Each register states its word offset. Each field
+states its two ends.
+
+An address counts bytes. A register offset counts words. One word occupies
+`wordBits / 8` bytes, so the address of word `offset` is
+`base + offset * (wordBits / 8)`. `bytesPerWord` is that count, derived from the
+width the map already states. A word width that is not a whole number of bytes is
+refused when the map is built.
+
+```scala
+object UartRegs extends RegisterMap(prefix = "UART_", pkg = "uart_regs",
+                                    base = 0x1000_0000, addressBits = 4):
+
+    object OpCodes extends CodedField(lo = 0, width = 2):
+        val Send, Clear, Cancel = code
+
+    object Control extends Register(0):
+        val Divider = bits(hi = 7, lo = 0)
+        val Enable  = bit(8)
+
+    object Command extends Register(1):
+        val Op    = add(OpCodes)
+        val Index = bits(hi = 9, lo = 4)
+
+    registers(Control, Command)
+```
+
+**A register states its extent, and may repeat.** `Register(offset, words,
+count, stride)` defaults to one word, one occurrence, stride one. `words` is how
+many words the register occupies from `offset`; `count` and `stride` declare a
+register that repeats, where slot `k` starts at `offset + k * stride`. The clash
+check compares occupied words, so a register spanning eight words holds eight.
+`wordsUsed` reports them, and `at(index)` gives a repetition's offset in an `is`
+label.
+
+```scala
+    object Resp    extends Register(8, words = 8)    // 8 words from word 8
+    object Mailbox extends Register(8, count = 4, stride = 2)   // words 8, 10, 12, 14
+```
+
+**A register takes no map.** A map lists its registers, so a register that asked
+the map for a `given` would start the map's body while its own was still running.
+Code outside a map names a register first, and that order would then read a
+register that is still null. A register therefore states nothing that needs the
+map, and each check that needs both runs in `registers(...)`.
+
+**A coded field is declared where R24 declares an encoding: as its own `object`
+in the map.** A nested `object` inside a register would be lazy, so its body
+would not run while the register was built, and the register would hold a field
+that was never created. An `object` in the map's body is built with the map.
+
+**The register names it, and that name is the field's.** `val Op = add(OpCodes)`
+records the field under `Op`, so the header says `UART_COMMAND_OP_SEND` whatever
+the codes object is called. A coded field that no register passes to `add` is
+refused when the map is listed, so a forgotten `add` is an error rather than a
+silently absent name.
+
+**Three consumers read one declaration.** A serving module reads a field through
+its handle. The map renders a C header for firmware. The map renders a
+SystemVerilog package for a testbench. Both renders read the same objects, so
+neither can disagree with the module or with the other.
+
+```scala
+   UartRegs.Command.Index.of(bus.writeData)   // the part-select, six bits wide
+   is(UartRegs.Command)                       // the word offset, as a constant
+```
+
+Before this rule the module writes `bus.writeData(9, 4)` and the header writes
+`UART_COMMAND_INDEX_SHIFT 4u`. Both numbers are the field's, written twice. A
+register that moves in the module gives firmware a stale address, and no build
+step compares the copies.
+
+**A field's facts are its low bit and its width.** The handle gives `of(signal)`,
+`lo`, `hi`, `width` and `mask`. `of` is R34's runtime window when its argument is
+not a constant, and R6.7's constant window otherwise.
+
+**A field of named codes is an encoding** (R24). Its members stand in every
+operand position, and its diagnostics name members. This rule adds no mechanism
+for codes.
+
+**A coded field is declared once and taken by name.** The codes are an `object`
+in the map, because a nested `object` inside a register is lazy and its body
+would not run while the register was built. The register takes the field as
+`val Op = add(OpCodes)`, and that `val`'s name is the field's name in both
+renders. A register that holds a coded field it never took is refused
+(`REGMAP_FIELD_UNTAKEN`), so a forgotten `add` is a diagnostic rather than an
+absent name.
+
+**No hardware comes from a map.** A map declares no signal and no statement, and
+it declares no register in the R13 sense. It emits no Verilog, and the IR gains
+no node. A module that reads a field through a handle emits the same bytes as the
+module that writes the bit pair by hand.
+
+**A register stands in an `is` label as its word offset.** One conversion does
+it, declared beside the register factories, and it satisfies R22's requirement
+that a label be an elaboration-time constant.
+
+**Both names are required, with no default.** `prefix` is the C name prefix and
+`pkg` is the SystemVerilog package name. Neither language gives a map a scope of
+its own, and a default would make two maps collide silently.
+
+**The C header renders by eight stated rules.** The name is `prefix`, the
+register's upper-case name, then `_` and the field's. A name the declaration
+pinned through `cName` is used exactly as pinned, because it is already a C name.
+A bit field is `(1u << n)`. A coded field writes one define per member, named
+`prefix`, register, field and code. A field that is wider than one bit writes
+`_SHIFT` and `_MASK`. The address is `base + offset * bytesPerWord`, as eight hex
+digits with a `u` suffix. The name column is 26 characters. The file opens by
+refusing a second map of its prefix.
+
+**A code can pin its number.** `code(at)` states a member's code and counting
+resumes above it, for a code an external document fixes. `code(at, cName)` pins
+its C name as well. `code` with no argument still counts from zero.
+
+```
+#ifndef UART_REGS_H
+#define UART_REGS_H
+
+#ifdef UART_REGS_DEFINED
+#error "a second register map uses the prefix UART_"
+#endif
+#define UART_REGS_DEFINED 1
+
+#define UART_CONTROL               0x10000000u
+#define UART_CONTROL_ENABLE        (1u << 8)
+#define UART_COMMAND_INDEX_SHIFT   4u
+#define UART_COMMAND_OP_SEND       0u
+
+#endif
+```
+
+**Every `#define` starts with `prefix`**, including a code's. A C macro has no
+scope: it reaches every file after its `#include`, with no way to qualify it.
+Only the prefix makes a name unique, so a code named `Send` in two registers
+stays two names because the register's name is in the path.
+
+**The prefix sentinel makes a second map of one prefix a compile error.** C
+requires a diagnostic for a redefinition that differs and permits one that does
+not, so a repeated `#define` is a warning at best and silent at worst. The
+sentinel is `#error`, which stops the build under every compiler with no flags.
+
+Because every name carries the prefix, two headers collide only by sharing a
+prefix, so one sentinel per header covers the whole file. It catches the case
+the generator cannot: two maps written by two separate runs.
+
+**The SystemVerilog render is a package.** A bench indexes a word by offset and
+slices a field by its low bit and its width, so the package states those and no
+mask.
+
+```systemverilog
+package uart_regs;
+    localparam logic [3:0] CONTROL_ADDRESS = 4'h0;       // the word offset
+    localparam int unsigned CONTROL_DIVIDER_SHIFT = 0;   // a field's low bit
+    localparam int unsigned CONTROL_DIVIDER_WIDTH = 8;   // ...and its width
+    localparam logic [1:0] COMMAND_OP_SEND = 2'd0;       // a code, at the field's width
+endpackage
+```
+
+A package is a real scope, so two maps may hold one member name and a bench says
+`uart_regs::CONTROL_ADDRESS` or imports one package at a time. Inside the
+package the member name starts with the register's upper-case name, so two
+registers of one map never collide, and a coded field's member carries the
+field's name as well.
+
+A bench reads a field as
+`got[uart_regs::CONTROL_DIVIDER_SHIFT +: uart_regs::CONTROL_DIVIDER_WIDTH]`,
+which is the sliced form R34 already emits.
+
+**A map renders its body apart from its wrapper.** `cDefines` is the `#define`
+lines a map owns. `cHeader` is that text with a guard and a sentinel around it. A
+design that owns several maps writes their bodies into one file inside one
+guard, as `CompanionLayout.header` does, and the non-register defines stay in the
+design.
+
+**A pinned C name stops at the header.** A package names its members from the
+declaration, because a bench reads a scope rather than a C macro, and a second
+naming of one field would be one fact stated twice.
+
+**One call writes every map of a design, and it compares their names.** A map
+cannot see its siblings, so the check lives where the maps are already named
+together: the call that writes their files.
+
+```scala
+    RegisterMap.write(dir, Seq(UartRegs, SpiRegs))
+```
+
+That call writes one `.h` and one `.sv` per map, and refuses two maps that share
+a `prefix` or a `pkg`. The list is not a separate register of maps: it is the
+argument the write already needs, so a map it omits has no file and fails at its
+first `#include`. A global registry would catch more and would break R3.
+
+**The decode stays the module's.** Each register behaves differently: a
+read-only status word, a write-only command with its own inner `switch`, a word
+that reads in eight slices. A decode helper would need one body per register,
+which is a separate construct with its own requirement.
+
+**`registers(...)` is the membership list and the forcing point.** Passing an
+object as an argument runs that object's body, which is what adds its fields to
+the header. A register that no call names is absent from the header; the cost of
+that is paid for by the compiler checking every name in the list.
+
+**Errors.** Seven, each its own R19 code. The first six fire while the map object
+initialises, because that is the first moment the whole block exists; five of
+them fire in `registers(...)`, where a register and the map meet. The seventh
+fires when the maps of a design are written together.
+
+- An **offset that needs more bits than the address width**, measured at the
+  highest word a register occupies.
+- **Two named registers on one word**, naming both, whether the word is a
+  register's own or one its extent covers.
+- A **field whose high bit is above the word's width**, reported at the field's
+  own declaration.
+- **Two fields of one register that share a bit**, naming both.
+- A **field or a code that is not bound to a `val`**, so it has no name.
+- A **coded field that a register holds without `add`**, so it would reach no
+  render and report nothing.
+- **Two maps of one design that share a `prefix` or a `pkg`**, naming both.
+
+The same clash outside one design is the header's own `#error`, because the
+generator sees only the maps it was given.
+
+*Rationale:* this is R24's bargain again. A surface declaration removes a
+repetition and records a fact, and it teaches no new node to any validation phase
+or to the emitter. The fact it records is larger, because three files need it
+rather than one.
+
 ---
 
 ## 6. Ports and logic
@@ -3247,10 +3476,10 @@ already suit that workflow.
 R27 is the one thing on this side of the line, and the line is *who is speaking*: a testbench
 drives a design and judges it from outside, which stays external; a `simOnly` block states what the
 module claims about itself, which no external probe can say as naturally because it would have to
-reach through hierarchy to name the signals. It adds no simulation *harness* to the library.
+reach through hierarchy to name the signals. It adds no simulation *testbench* to the library.
 
 **Guard:** R19's diagnostics and R17's source locations remain a public API regardless, because any
-future harness will want to map signal names back to source. This costs nothing now and keeps the
+future testbench will want to map signal names back to source. This costs nothing now and keeps the
 door open.
 
 ### Type-level widths
@@ -3400,6 +3629,7 @@ to a heading and a summary.
 | R31.1 | An interface states its protocol | An interface states its protocol beside its fields; each endpoint emits it as simulation-only checks |
 | R32 | A synchronous FIFO | `scalahdl.lib.SyncFifo`: a same-domain queue of `depth` words between two endpoints, no ready chain |
 | R34 | A runtime selection on a packed bit-vector | A runtime selection on a packed bit-vector: `word(idx)` and `word(idx, w)` emit Verilog's `word[i]` and `word[i +: w]`; a window is a register-only assignment target (R6.7) |
+| R40 | A register map | A register map: one declaration of a block's registers and fields, read by the serving module as typed handles, rendered as a prefixed C header and a SystemVerilog package; no signal, no IR node, decode stays hand-written |
 
 ---
 

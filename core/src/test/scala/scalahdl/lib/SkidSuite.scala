@@ -16,7 +16,7 @@ final class SkidSuite extends munit.FunSuite:
 
   private def emitted(skid: Skid): String =
     val design = skid.elaborateDesign()
-    new Emission("0.1.0-SNAPSHOT").emit(design).files.head._2
+    new Emission("0.1.1").emit(design).files.head._2
 
   test("the ports are R8's, named for the endpoints they belong to"):
     val module = (new Skid(8)).elaborate()

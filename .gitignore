@@ -3,6 +3,8 @@ target/
 project/target/
 project/project/
 .bsp/
+# Metals semantic index; build output, normally written under target/.
+*.semanticdb
 
 # editors
 .idea/

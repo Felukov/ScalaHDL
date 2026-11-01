@@ -48,7 +48,7 @@ class OperandKindMatrixSuite extends munit.FunSuite:
     try
       val m = body
       val design = m.elaborateDesign()
-      Right(new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, m.moduleName))
+      Right(new VerilogEmitter("0.1.1").emitModule(design.top, m.moduleName))
     catch
       case e: ValidationFailed => Left(e.diagnostics.map(_.render).mkString("\n"))
       case e: RuntimeException => Left(Option(e.getMessage).getOrElse(e.toString))

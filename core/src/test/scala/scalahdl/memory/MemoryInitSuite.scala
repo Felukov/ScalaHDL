@@ -20,7 +20,7 @@ class MemoryInitSuite extends munit.FunSuite:
 
   private def emit(m: Module): String =
     val design = m.elaborateDesign()
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, design.top.name)
+    new VerilogEmitter("0.1.1").emitModule(design.top, design.top.name)
 
   // -- the IR carries the image ------------------------------------------
 

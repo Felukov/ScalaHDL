@@ -29,7 +29,7 @@ class LiteralWidthSuite extends munit.FunSuite:
       val q = Out(UInt(8))
       q := wbin + 1.U       // 1.U has no width; inherits wbin's width 8
     val design = (new Good).elaborateDesign()
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Good")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Good")
     assert(v.contains("8'd1"),
       s"literal should be resolved to width 8: $v")
 

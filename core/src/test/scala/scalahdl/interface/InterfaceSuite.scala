@@ -12,7 +12,7 @@ import scalahdl.emit.VerilogEmitter
 final class InterfaceSuite extends munit.FunSuite:
 
   private def emit(top: Module): String =
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(top.elaborateDesign().top, "Top")
+    new VerilogEmitter("0.1.1").emitModule(top.elaborateDesign().top, "Top")
 
   private def ports(top: Module): List[(String, Direction, Type)] =
     top.elaborateDesign().top.ports.map(p => (p.name, p.direction, p.typeOf))
@@ -173,7 +173,7 @@ final class InterfaceSuite extends munit.FunSuite:
 
     val top = (new Top).elaborateDesign().top
     assertEquals(top.drivers.size, 3)
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(top, "Top")
+    val v = new VerilogEmitter("0.1.1").emitModule(top, "Top")
     assert(v.contains("m_valid = s_valid;"), v)
     assert(v.contains("m_payload = s_payload;"), v)
     assert(v.contains("s_ready = m_ready;"), v)

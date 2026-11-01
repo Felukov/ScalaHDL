@@ -33,7 +33,7 @@ class NamePhaseSuite extends munit.FunSuite:
     // duplicate; it records both and lets the NamePhase report).
     val handBuilt = Module(
       name = "Hand",
-      ports = List(Port("clk", Direction.In, Type.Bool, Loc("f", 1, 1))),
+      ports = List(Port("clk", Direction.In, Type.Bool, Loc("f", 1, 1), SignalId(0))),
       signals = List(
         Signal(SignalId(0), "clk", Type.Bool,    SignalKind.Wire, None, Loc("f", 1, 1)),
         Signal(SignalId(1), "x",   Type.UInt(8), SignalKind.Wire, None, Loc("f", 2, 1)),

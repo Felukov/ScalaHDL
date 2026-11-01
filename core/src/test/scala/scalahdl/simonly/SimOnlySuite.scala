@@ -24,7 +24,7 @@ class SimOnlySuite extends munit.FunSuite:
     given defaultDomain: ClockDomain = ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
 
   private def emitted(m: Module): String =
-    new Emission("0.1.0-SNAPSHOT").emit(m.elaborateDesign()).files.head._2
+    new Emission("0.1.1").emit(m.elaborateDesign()).files.head._2
 
   private def refused(code: Code)(body: => Module): Diagnostic =
     val failure = intercept[ValidationFailed] { body.elaborateDesign() }

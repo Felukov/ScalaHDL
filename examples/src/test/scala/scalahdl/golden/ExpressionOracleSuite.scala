@@ -204,7 +204,7 @@ final class ExpressionOracleSuite extends munit.FunSuite:
 
     val temp = Files.createTempDirectory("scalahdl-expr-oracle-")
     val design = (new ExprOracle).elaborateDesign()
-    val emitted = new Emission("0.1.0-SNAPSHOT").emit(design)
+    val emitted = new Emission("0.1.1").emit(design)
     assertEquals(emitted.files.map(_._1), List("ExprOracle.v"))
     val verilog = temp.resolve("ExprOracle.v")
     Files.writeString(verilog, emitted.files.head._2, StandardCharsets.UTF_8)

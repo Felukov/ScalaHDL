@@ -26,7 +26,7 @@ class AssignmentLiteralSuite extends munit.FunSuite:
 
   private def emit(body: => Module): String =
     val m = body
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(m.elaborateDesign().top, m.moduleName)
+    new VerilogEmitter("0.1.1").emitModule(m.elaborateDesign().top, m.moduleName)
 
   private def expectFailure(body: => Module): List[Diagnostic] =
     intercept[ValidationFailed] { body.elaborateDesign() }.diagnostics

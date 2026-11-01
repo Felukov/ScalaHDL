@@ -19,6 +19,36 @@ the design does not validate. `./tools/lib-sim.sh` needs Verilator on `PATH` and
 exits 2 without it; the Verilator-dependent suites skip in that case, so
 `sbt test` is green either way.
 
+## Publishing
+
+The public repository is a release transcript, not a copy of this one. Its
+history holds one commit per release and nothing else: no private commit, hash,
+or provisional subject appears in it. `tools/export-public.sh` writes that
+commit from `HEAD`.
+
+To publish a release:
+
+1. Add a `## <version> — <date>` section at the top of [`CHANGELOG.md`](CHANGELOG.md)
+   and commit it. The heading names the release; the lines under it become the
+   commit message.
+2. Run the exporter against the release checkout:
+
+   ```sh
+   ./tools/export-public.sh ../ScalaHDL-public \
+       git@github.com:Felukov/ScalaHDL.git --push
+   ```
+
+The script refuses three cases, each naming what to fix: a top heading that
+still says `Unreleased` or `SNAPSHOT`; a tree that changed while the heading
+still names a published version; and a destination directory holding history
+the script did not write. A run with nothing new adds no commit.
+
+The tree it publishes is `git archive HEAD`, so build output (`target/`,
+`generated/`, `.bloop/`, `.metals/`) cannot reach the public repository. The
+paths listed in the script's `exclude` array are removed as well; that array is
+the only written record of the public/private split, so a new internal path is
+published unless it is added there.
+
 ## Emission tests
 
 ScalaHDL emits Verilog, so the tests pin the exact text it emits. Each test

@@ -24,7 +24,7 @@ class ExpressionSurfaceSuite extends munit.FunSuite:
   def emit(body: => Module): String =
     val m = body
     val design = m.elaborateDesign()
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, m.moduleName)
+    new VerilogEmitter("0.1.1").emitModule(design.top, m.moduleName)
 
   def expectFailure(body: => Module): List[Diagnostic] =
     intercept[ValidationFailed] { body.elaborateDesign() }.diagnostics

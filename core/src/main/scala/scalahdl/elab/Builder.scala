@@ -215,22 +215,22 @@ final class Builder:
   def portsList: List[Port] = _ports.toList
 
   /** R18.2 — Direction lookup used while validating declaration-side blackbox
-    * domain metadata. Ports and their backing signals share declaration order. */
+    * domain metadata. The port records the signal it was declared onto, so the
+    * lookup does not depend on the two lists being the same length. */
   private[scalahdl] def portDirection(id: SignalId): Option[Direction] =
-    _signals.indexWhere(_.id == id) match
-      case i if i >= 0 && i < _ports.length => Some(_ports(i).direction)
-      case _ => None
+    _ports.find(_.signalId == id).map(_.direction)
 
   /** R18.1 — Rename a declared port for an external module while retaining its
     * SignalId. This operation is intentionally available only during blackbox
     * declaration, before the builder is frozen. */
   private[scalahdl] def renamePort(id: SignalId, externalName: String): Unit =
     require(externalName.nonEmpty, "external port name must be non-empty")
+    val portIndex = _ports.indexWhere(_.signalId == id)
+    require(portIndex >= 0, "named may only be applied to a port")
     val signalIndex = _signals.indexWhere(_.id == id)
-    require(signalIndex >= 0 && signalIndex < _ports.length,
-      "named may only be applied to a port")
+    require(signalIndex >= 0, "named may only be applied to a port")
     val oldName = _signals(signalIndex).name
-    _ports(signalIndex) = _ports(signalIndex).copy(name = externalName)
+    _ports(portIndex) = _ports(portIndex).copy(name = externalName)
     _signals(signalIndex) = _signals(signalIndex).copy(name = externalName)
     byName.remove(oldName)
     byName(externalName) = id
@@ -432,14 +432,18 @@ final class Builder:
               onto: Option[DslSignal] = None,
               asynchronous: Boolean = false): DslSignal =
     val name = resolveName(src, t)
-    val port = Port(name, dir, t, src.loc)
-    _ports += port
     // R13.1/R05.7 — a port is neutral, which is what makes a module's boundary
     // free; an input *declared* asynchronous is the exception, and carries a
     // domain foreign to every clock so that reading it is a crossing.
-    declareSignal(name, t, SignalKind.Wire, init = None, loc = src.loc,
+    val signal = declareSignal(name, t, SignalKind.Wire, init = None, loc = src.loc,
       domain = if asynchronous then ClockDomain.asynchronous else ClockDomain.noClock,
       encoding = encoding, onto = onto)
+    // R10 — the port records the signal it was declared onto. The two lists are
+    // appended in step here, but a module whose body declares a wire between two
+    // ports (a base class's, for instance) keeps them the same length and not the
+    // same order, so nothing may read one by the other's position.
+    _ports += Port(name, dir, t, src.loc, signal.id)
+    signal
 
   /** Declare an internal wire (R2: only named vals get a declaration). */
   def addWire(src: Source, t: Type, domain: ClockDomain,
@@ -2004,9 +2008,7 @@ final class Builder:
       throw ExprTypeError(s"expression references an undeclared signal id ${id.value}"))
 
   private[scalahdl] def signalIdForPort(name: String): Option[SignalId] =
-    _ports.indexWhere(_.name == name) match
-      case i if i >= 0 && i < _signals.length => Some(_signals(i).id)
-      case _ => None
+    _ports.find(_.name == name).map(_.signalId)
 
   private def scalaHdlBlackBoxDiagnostic(code: scalahdl.diag.Code,
                                          summary: String): scalahdl.diag.Diagnostic =

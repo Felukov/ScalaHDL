@@ -16,7 +16,7 @@ import scalahdl.examples.{AddressSlot, CpuAddressMap}
   * by `core`'s `InstanceArrayBundles` golden. */
 class CpuAddressMapSuite extends munit.FunSuite:
 
-  private val emitted = new Emission("0.1.0-SNAPSHOT")
+  private val emitted = new Emission("0.1.1")
     .emit((new CpuAddressMap).elaborateDesign(), "scalahdl.examples.CpuAddressMap")
 
   test("three map entries instantiate three units of one emitted module"):

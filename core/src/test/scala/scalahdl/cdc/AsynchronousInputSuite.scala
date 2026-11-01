@@ -174,7 +174,7 @@ final class AsynchronousInputSuite extends FunSuite:
     // The two designs differ only in the name their class carries, so that
     // name is the one thing normalised before the texts are compared.
     def verilog(module: scalahdl.core.Module, name: String): String =
-      new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(module, "Top")
+      new VerilogEmitter("0.1.1").emitModule(module, "Top")
         .replace(s"module $name(", "module Pin(")
 
     val marked = verilog((new Marked).elaborate(), "Marked")

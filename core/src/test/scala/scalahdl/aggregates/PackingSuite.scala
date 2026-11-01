@@ -23,7 +23,7 @@ class PackingSuite extends munit.FunSuite:
     val b = Bits(w)
 
   private def emit(top: Module): String =
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(top.elaborateDesign().top, "Top")
+    new VerilogEmitter("0.1.1").emitModule(top.elaborateDesign().top, "Top")
 
   test("a bundle read as bits is a concat, first field in the MSBs"):
     // Bundle { a = Bits(4); b = Bits(4) }, a=0xA, b=0x5 → {a, b} = 8'hA5

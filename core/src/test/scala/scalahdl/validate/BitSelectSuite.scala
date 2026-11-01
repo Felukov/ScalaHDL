@@ -38,7 +38,7 @@ class BitSelectSuite extends munit.FunSuite:
       // here, so this test confirms a named-signal slice elaborates and emits.
       lo := a(7, 4)
     val design = (new Good).elaborateDesign()
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Good")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Good")
     assert(v.contains("a[7:4]"),
       s"should emit slice of a as a[7:4]: $v")
 
@@ -48,7 +48,7 @@ class BitSelectSuite extends munit.FunSuite:
       val q = Out(UInt(4))
       q := a(7, 4)           // slice of a named signal (a is a port/DslSignal)
     val design = (new Good).elaborateDesign()
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Good")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Good")
     assert(v.contains("a[7:4]"),
       s"should emit slice as a[7:4]: $v")
 
@@ -58,6 +58,6 @@ class BitSelectSuite extends munit.FunSuite:
       val q = Out(UInt(1))
       q := a(0)              // index of a named signal
     val design = (new Good).elaborateDesign()
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Good")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Good")
     assert(v.contains("a["),
       s"should emit index as a[...]: $v")

@@ -16,7 +16,7 @@ class RegisterFileGoldenSuite extends munit.FunSuite:
 
   def emitted(): String =
     val design = (new RegisterFile).elaborateDesign()
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "RegisterFile")
+    new VerilogEmitter("0.1.1").emitModule(design.top, "RegisterFile")
 
   test("aggregate emission is deterministic"):
     assertEquals(emitted(), emitted())

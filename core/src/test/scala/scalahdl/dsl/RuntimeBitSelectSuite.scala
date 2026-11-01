@@ -26,7 +26,7 @@ class RuntimeBitSelectSuite extends munit.FunSuite:
     given defaultDomain: ClockDomain = ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
 
   private def emit(m: Module): String =
-    new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(m.elaborateDesign().top, "Top")
+    new VerilogEmitter("0.1.1").emitModule(m.elaborateDesign().top, "Top")
 
   test("a runtime index reads a bit of a packed scalar as word[i], with no mux"):
     class Top extends Fix:

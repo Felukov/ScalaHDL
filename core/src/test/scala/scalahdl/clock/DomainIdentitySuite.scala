@@ -73,7 +73,7 @@ class DomainIdentitySuite extends munit.FunSuite:
                                 mem.readSync(addr, WriteFirst) }
                 else mem.readSync(addr, WriteFirst)
         dout := q
-      new VerilogEmitter("0.1.0-SNAPSHOT")
+      new VerilogEmitter("0.1.1")
         .emitModule((new M(splitRecords)).elaborateDesign().top, "M")
     val together = emit(false)
     val split    = emit(true)
@@ -90,7 +90,7 @@ class DomainIdentitySuite extends munit.FunSuite:
       mem.write(addr, din, we)
       val q = { given ClockDomain = unreset; mem.readSync(addr, ReadFirst) }
       dout := q
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT")
+    val v = new VerilogEmitter("0.1.1")
       .emitModule((new M).elaborateDesign().top, "M")
     // One block per access (R15.1), and here there are two: a write and a read
     // recorded under different reset shapes on the one clock. What this test

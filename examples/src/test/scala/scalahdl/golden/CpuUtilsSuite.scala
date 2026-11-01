@@ -21,7 +21,7 @@ import scalahdl.examples.{AddressSlot, CpuBankMap, CpuRequest, CpuResponse,
 class CpuUtilsSuite extends munit.FunSuite:
 
   private def emit(m: Module, name: String): Map[String, String] =
-    new Emission("0.1.0-SNAPSHOT").emit(m.elaborateDesign(), name).files.toMap
+    new Emission("0.1.1").emit(m.elaborateDesign(), name).files.toMap
 
   private val scratch = emit(new CpuScratchMap, "scalahdl.examples.CpuScratchMap")
   private val banks   = emit(new CpuBankMap, "scalahdl.examples.CpuBankMap")

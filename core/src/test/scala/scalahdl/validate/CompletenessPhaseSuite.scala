@@ -106,7 +106,7 @@ class CompletenessPhaseSuite extends munit.FunSuite:
       when(sel) { r := a }
     val design = (new Good).elaborateDesign()
     import scalahdl.emit.VerilogEmitter
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Good")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Good")
     // The register block should NOT contain `r <= r;` (self-hold injected).
     assert(!v.contains("r <= r;"),
       s"emitter must not inject a self-assignment for hold: $v")

@@ -3,7 +3,17 @@
 
 ThisBuild / scalaVersion := "3.3.8"
 ThisBuild / organization := "scalahdl"
-ThisBuild / version      := "0.1.0-SNAPSHOT"
+ThisBuild / version      := "0.1.1"
+
+// SemanticDB paths are relative to a source root, and sbt names only the
+// output directory. Without this, the compiler takes the source root from the
+// working directory, so a run started outside this directory cannot
+// relativise these sources and writes a `.semanticdb` file beside every
+// `.scala` under src/. Naming the root keeps the index under target/.
+ThisBuild / scalacOptions ++= Seq(
+  "-sourceroot",
+  (ThisBuild / baseDirectory).value.getAbsolutePath
+)
 
 // Two subprojects: the library proper, and examples that depend on it.
 // Examples are kept out of any published artifact (R20/contract clarity).

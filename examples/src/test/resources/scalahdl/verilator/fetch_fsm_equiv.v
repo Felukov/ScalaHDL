@@ -1,4 +1,4 @@
-// R22 — the equivalence harness for the fetch controller.
+// R22 — the equivalence testbench for the fetch controller.
 //
 // One clock, one set of stimulus, two implementations: `FetchFsm` (the M14
 // `switch`) and `FetchFsmReference` (the four equality-tested `when` blocks it

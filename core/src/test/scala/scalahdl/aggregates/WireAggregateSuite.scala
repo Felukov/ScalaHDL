@@ -42,7 +42,7 @@ class WireAggregateSuite extends munit.FunSuite:
     val sig = design.top.signals.find(_.name == "staged").getOrElse(fail("no staged signal"))
     assert(sig.typeOf.isInstanceOf[Type.Bundle], s"staged should be a Bundle: ${sig.typeOf}")
     assertEquals(sig.kind, SignalKind.Wire)
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
     assert(v.contains("staged_addr"), s"should emit the addr leaf: $v")
     assert(v.contains("staged_prot"), s"should emit the prot leaf: $v")
 
@@ -71,7 +71,7 @@ class WireAggregateSuite extends munit.FunSuite:
         entries(j).prot := src.prot
       probe := entries(2).addr
     val design = (new Top).elaborateDesign()
-    val v = new VerilogEmitter("0.1.0-SNAPSHOT").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
     // One net array per leaf, not one per element (R14.1 picks the form from
     // In/Out vs internal — not from Reg vs Wire).
     assert(v.contains("entries_addr [0:3]"), s"addr leaf should be a net array: $v")

@@ -97,4 +97,16 @@ enum Code:
        // sensitivity list is empty, so no event can trigger it and its target
        // keeps its initial value. What R12.1 cannot turn into a continuous
        // assignment is what lands here.
-       COMBINATIONAL_NEVER_RUNS
+       COMBINATIONAL_NEVER_RUNS,
+       // R40 — the five ways a register map's declaration can be wrong, and
+       // the one way two maps can disagree. The first five fire while a map
+       // object initialises, as R24's do, because that is the first moment the
+       // whole block exists. The last needs two maps, so it fires where they
+       // are named together: the call that writes their files.
+       REGMAP_OFFSET_OUT_OF_RANGE, REGMAP_DUPLICATE_OFFSET,
+       REGMAP_FIELD_OUT_OF_RANGE, REGMAP_FIELDS_OVERLAP,
+       REGMAP_FIELD_ANONYMOUS, REGMAP_NAME_CLASH,
+       // R40 — a coded field a register holds but never took through `add`. It
+       // would reach no render and report nothing, so the omission is the fault
+       // rather than a style choice.
+       REGMAP_FIELD_UNTAKEN
