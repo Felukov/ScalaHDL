@@ -29,7 +29,7 @@ class BundleSmokeSuite extends munit.FunSuite:
     assertEquals(fields, List("addr", "prot"), s"field names should be addr,prot: $fields")
     // The field access `req.addr` resolves as a real symbol and emits the
     // leaf name `req_addr` in the assignment expression.
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     assert(v.contains("req_addr"), s"should emit req_addr in the expression: $v")
     // R07.1: the bundle port expands to per-leaf port lines.
     assert(v.contains("req_addr"), s"port should expand to req_addr: $v")
@@ -46,7 +46,7 @@ class BundleSmokeSuite extends munit.FunSuite:
       // runtime-index read on internal Vec → entries[i] (no mux)
       rd := entries(i)
     val design = (new Top).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     // R14.1: internal Vec → one net array, `reg [7:0] entries [0:3];`
     assert(v.contains("reg [7:0] entries [0:3];"), s"internal Vec should be struct-of-arrays: $v")
     // R14.1: runtime-index read → entries[i] (no mux)
@@ -72,7 +72,7 @@ class BundleSmokeSuite extends munit.FunSuite:
       val q = Out(UInt(8))
       q := entries(2).addr
     val design = (new Top).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     assert(v.contains("q = entries_addr[2]"), s"typed entries(2).addr must preserve the Vec index path: $v")
 
   test("arbitrarily nested Vec dimensions lower recursively and preserve path order"):
@@ -84,6 +84,6 @@ class BundleSmokeSuite extends munit.FunSuite:
       val q = Out(UInt(8))
       q := matrix(i)(j)
     val design = (new Top).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     assert(v.contains("reg [7:0] matrix [0:1] [0:3];"), s"all Vec dimensions must be retained: $v")
     assert(v.contains("q = matrix[i][j]"), s"nested runtime indices must retain order: $v")

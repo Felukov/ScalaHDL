@@ -113,6 +113,48 @@ Its class body declares the hardware:
 
 The clock-domain `given` must appear before registers that use it.
 
+### Grouping ports under `io`
+
+SpinalHDL's `val io = new Bundle { ... }` puts a module's ports under one name,
+apart from its internal signals. ScalaHDL groups them with an `Interface` (R31)
+instead: a `Bundle` stays direction-free (R7), while an interface writes each
+direction once, from one viewpoint, and `Master`/`Slave` choose the side.
+
+```scala
+final case class CounterIO() extends Interface:
+  val clk   = In(Clock())
+  val rst   = In(Reset(ActiveHigh))
+  val en    = In(Bool())
+  val count = Out(UInt(8))
+
+class Counter extends Module:
+  val io = Master(CounterIO())
+
+  given defaultDomain: ClockDomain =
+    ClockDomain(io.clk, io.rst, ResetKind.Sync, ActiveHigh)
+
+  val cnt = Reg(UInt(8), init = 0.U(8))
+  when(io.en) { cnt := cnt + 1.U(8) }
+  io.count := cnt
+```
+
+The ports are still ordinary module ports — `io_en`, `io_count`, and so on —
+but the group is one declaration and the module refers to them as `io.en` and
+`io.count`. The group can be reused by every module with the same face, and
+two endpoints of it connect leaf by leaf with `<>`. See
+[`FlowExample.scala`](examples/src/main/scala/scalahdl/examples/FlowExample.scala)
+for the request/answer shape from SpinalHDL's `FlowExample`.
+
+A group may also nest a `Vec` of another interface:
+
+```scala
+val lanes = Slave(Vec(2, Lane()))
+```
+
+This declares `io_lanes_0_*` and `io_lanes_1_*` and returns the elements as
+an `IndexedSeq`, so `io.lanes(0).valid` reads one lane; `<>` walks the
+elements with the rest of the group.
+
 ### Saying what the module claims about itself
 
 A module can state an invariant beside the logic that maintains it:

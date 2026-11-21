@@ -36,7 +36,7 @@ final class SwitchCaseOracleSuite extends munit.FunSuite:
       "Verilator not on PATH; skipping R22's simulation criterion")
 
     val temp = Files.createTempDirectory("scalahdl-switch-oracle-")
-    val emission = new Emission("0.1.1")
+    val emission = new Emission("0.1.2")
 
     val switchForm = emission.emit((new FetchFsm).elaborateDesign())
     val whenForm = emission.emit((new FetchFsmReference).elaborateDesign())

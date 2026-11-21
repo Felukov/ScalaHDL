@@ -20,7 +20,7 @@ class WholeAggregateAssignSuite extends munit.FunSuite:
     val hi = UInt(w)
 
   private def emit(top: Module): String =
-    new VerilogEmitter("0.1.1").emitModule(top.elaborateDesign().top, "Top")
+    new VerilogEmitter("0.1.2").emitModule(top.elaborateDesign().top, "Top")
 
   test("a bundle assignment emits one statement per leaf, in declaration order"):
     class Top extends Module:

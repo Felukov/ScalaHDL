@@ -17,7 +17,7 @@ final class AsyncFifoSuite extends munit.FunSuite:
 
   private def emitted() =
     val design = (new AsyncFifo()).elaborateDesign()
-    new Emission("0.1.1").emit(design)
+    new Emission("0.1.2").emit(design)
 
   private def walkExpr(expr: Expr): List[Expr] = expr :: (expr match
     case Expr.UnOp(_, arg) => walkExpr(arg)

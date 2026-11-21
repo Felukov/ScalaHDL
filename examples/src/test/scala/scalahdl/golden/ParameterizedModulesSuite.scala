@@ -23,7 +23,7 @@ class ParameterizedModulesSuite extends munit.FunSuite:
       "ParameterizedModules"
     ))
 
-    val emitted = new Emission("0.1.1")
+    val emitted = new Emission("0.1.2")
       .emit(design, "scalahdl.examples.ParameterizedModules")
     assertEquals(emitted.files.map(_._1), List(
       "WordPipe_w8.v",

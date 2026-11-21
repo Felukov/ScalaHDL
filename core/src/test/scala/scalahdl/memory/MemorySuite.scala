@@ -15,7 +15,7 @@ class MemorySuite extends munit.FunSuite:
 
   private def emit(m: Module): String =
     val design = m.elaborateDesign()
-    new VerilogEmitter("0.1.1", Some(Vendor.Xilinx)).emitModule(design.top, design.top.name)
+    new VerilogEmitter("0.1.2", Some(Vendor.Xilinx)).emitModule(design.top, design.top.name)
 
   test("all three explicit kinds elaborate as first-class memory IR nodes"):
     class Top extends Clocked:
@@ -132,7 +132,7 @@ class MemorySuite extends munit.FunSuite:
     val top = (new Top).elaborate()
     assertEquals(top.memories.head.reads.map(_.domain.clkName), List("clkA", "clkB"))
     assertEquals(top.memories.head.reads.map(_.policy), List(ReadDuringWrite.ReadFirst, ReadDuringWrite.WriteFirst))
-    val v = new VerilogEmitter("0.1.1", Some(Vendor.Xilinx)).emitModule(top, "Top")
+    val v = new VerilogEmitter("0.1.2", Some(Vendor.Xilinx)).emitModule(top, "Top")
     assert(v.contains("always @(posedge clkA)"), v)
     assert(v.contains("always @(posedge clkB)"), v)
 
@@ -157,7 +157,7 @@ class MemorySuite extends munit.FunSuite:
       when(weB) { mem.write(addrB, dataB) }
 
     val top = (new Top).elaborate()
-    val v = new VerilogEmitter("0.1.1", Some(Vendor.Xilinx)).emitModule(top, "Top")
+    val v = new VerilogEmitter("0.1.2", Some(Vendor.Xilinx)).emitModule(top, "Top")
     // Each port's read is its own write enable and the array, and neither
     // carries an address comparison: one port is one address, so the
     // comparison a `WriteFirst` bypass needs is a tautology here.
@@ -179,7 +179,7 @@ class MemorySuite extends munit.FunSuite:
       val q = mem.readSync(raddr, WriteFirst)
       mem.write(waddr, data)
 
-    val v = new VerilogEmitter("0.1.1", Some(Vendor.Xilinx)).emitModule((new Top).elaborate(), "Top")
+    val v = new VerilogEmitter("0.1.2", Some(Vendor.Xilinx)).emitModule((new Top).elaborate(), "Top")
     assert(v.contains("q_mem_data <= ((waddr == raddr) ? data : mem[raddr]);"), v)
 
   test("bundle elements are packed in memory and flattened at the read result"):

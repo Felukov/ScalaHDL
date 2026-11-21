@@ -115,7 +115,7 @@ class ConnectedClockSuite extends munit.FunSuite:
       u.rst_n := slowRst_n
       out := unsafeCrossDomain(u.q, "test fixture: the crossing is the point")
     val top = verdict(new M).getOrElse(fail("blessed crossing should elaborate"))
-    val v = new VerilogEmitter("0.1.1").emitModule(top, "M")
+    val v = new VerilogEmitter("0.1.2").emitModule(top, "M")
     assert(v.contains(".clk(slowClk)"), s"the pin keeps its connection: $v")
     assert(v.contains(".rst_n(slowRst_n)"), s"and so does the reset: $v")
     assertEquals(top.signals.find(_.name == "u_q").map(_.domain.clkName), Some("slowClk"))

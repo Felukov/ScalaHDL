@@ -338,7 +338,7 @@ object CoreGoldens:
 
   def emitSignedSurface(): String =
     val design = (new SignedSurface).elaborateDesign()
-    new scalahdl.emit.VerilogEmitter("0.1.1").emitModule(design.top, "SignedSurface")
+    new scalahdl.emit.VerilogEmitter("0.1.2").emitModule(design.top, "SignedSurface")
 
   /** A single register-backed memory, for the absent-hint assertion. The value
     * is named `memory` so the declaration line under test is the one the test
@@ -355,7 +355,7 @@ object CoreGoldens:
   /** Emit the one memory with `vendor`'s hint, or none when it is `None`. */
   def emitMemoryFor(vendor: Option[Vendor]): String =
     val design = (new HintedMemory).elaborateDesign()
-    new scalahdl.emit.VerilogEmitter("0.1.1", vendor)
+    new scalahdl.emit.VerilogEmitter("0.1.2", vendor)
       .emitModule(design.top, "HintedMemory")
 
   // ---- the constructions without golden coverage ----------------

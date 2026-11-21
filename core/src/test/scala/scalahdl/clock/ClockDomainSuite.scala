@@ -28,7 +28,7 @@ class ClockDomainSuite extends munit.FunSuite:
       val cnt = Reg(UInt(8), init = 0.U(8))
       cnt := cnt + 1.U(8)
     val design = (new AsyncLow).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "AsyncLow")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "AsyncLow")
     assert(v.contains("always @(posedge clk or negedge rst_n)"),
       s"async active-low sensitivity list: $v")
     assert(v.contains("if (!rst_n)"),
@@ -42,7 +42,7 @@ class ClockDomainSuite extends munit.FunSuite:
       val cnt = Reg(UInt(8), init = 0.U(8))
       cnt := cnt + 1.U(8)
     val design = (new SyncHigh).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "SyncHigh")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "SyncHigh")
     assert(v.contains("always @(posedge clk)"),
       s"sync active-high sensitivity list: $v")
     assert(v.contains("if (rst)"),
@@ -59,7 +59,7 @@ class ClockDomainSuite extends munit.FunSuite:
       val cnt = Reg(UInt(8))   // no init = no reset branch
       cnt := cnt + 1.U(8)
     val design = (new NoInit).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "NoInit")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "NoInit")
     assert(!v.contains("if (rst)"),
       s"no reset branch without init: $v")
     assert(v.contains("always @(posedge clk)"),
@@ -83,7 +83,7 @@ class ClockDomainSuite extends munit.FunSuite:
       free := free + 1.U(8)
       { given ClockDomain = low; acc := acc + cnt }
     val design = (new AsyncNoInit).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "AsyncNoInit")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "AsyncNoInit")
     // A reset edge with no branch to answer it clocks the input in on the
     // reset — the opposite of the hold R13 promises.
     assertEquals(v.linesIterator.count(_.contains("always @(posedge clk)")), 2,

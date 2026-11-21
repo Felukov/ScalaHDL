@@ -42,7 +42,7 @@ class PowerUpSuite extends munit.FunSuite:
     val data = In(UInt(16))
     val out = Out(Bool())
 
-    given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+    given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
 
     val shifter = Reg(UInt(16), powerUp = 0xffff.U(16))
     when(en) {
@@ -63,7 +63,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val set = In(Bool())
       val q = Out(Bool())
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val armed = Reg(Bool(), powerUp = True)
       when(set) { armed := False }
       q := armed
@@ -73,7 +73,7 @@ class PowerUpSuite extends munit.FunSuite:
     class Counter extends Module:
       val clk = In(Clock())
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val count = Reg(UInt(8), powerUp = 5)
       count := count + 1.U(8)
       q := count
@@ -85,7 +85,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val d = In(UInt(8))
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val held = Reg(UInt(8))
       held := d
       q := held
@@ -95,7 +95,7 @@ class PowerUpSuite extends munit.FunSuite:
     class Unreset extends Module:
       val clk = In(Clock())
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val count = Reg(UInt(8), init = 5.U(8))
       count := count + 1.U(8)
       q := count
@@ -112,7 +112,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val take = In(Bool())
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val packet = Reg(new Packet, init = 0.U(9))
       when(take) { packet.valid := True }
       q := packet.addr
@@ -123,7 +123,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val rst = In(Reset(ActiveHigh))
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
+      given defaultDomain: ClockDomain = ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
       val count = Reg(UInt(8), init = 7.U(8))
       count := count + 1.U(8)
       q := count
@@ -136,7 +136,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val rst_n = In(Reset(ActiveLow))
       val q = Out(Bool())
-      given clocking: ClockDomain = ClockDomain(clk, rst_n, ResetKind.Async, ActiveLow)
+      given defaultDomain: ClockDomain = ClockDomain(clk, rst_n, ResetKind.Async, ActiveLow)
       val armed = Reg(Bool(), init = True)
       armed := !armed
       q := armed
@@ -152,13 +152,13 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val q = Out(Bool())
     class Unreset extends Shifted:
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val armed = Reg(Bool(), powerUp = True)
       armed := !armed
       q := armed
     class Resetting extends Shifted:
       val rst = In(scalahdl.dsl.Reset(ActiveHigh))
-      given clocking: ClockDomain = ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
+      given defaultDomain: ClockDomain = ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
       val armed = Reg(Bool(), powerUp = True)
       armed := !armed
       q := armed
@@ -172,7 +172,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val seed = In(UInt(8))
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val held = Reg(UInt(8), powerUp = seed)
       held := held + 1.U(8)
       q := held
@@ -188,7 +188,7 @@ class PowerUpSuite extends munit.FunSuite:
       val clk = In(Clock())
       val take = In(Bool())
       val q = Out(UInt(8))
-      given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+      given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
       val packet = Reg(new Packet, powerUp = 0.U(9))
       when(take) { packet.valid := True }
       q := packet.addr

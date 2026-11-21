@@ -21,7 +21,7 @@ import scalahdl.examples.{FetchFsm, FetchMachine, FetchMachineReference}
   * The report is checked here rather than in `core` for the same reason: this
   * is the first design whose diagram someone would actually read. */
 final class FsmMachineGoldenSuite extends munit.FunSuite:
-  private val version = "0.1.1"
+  private val version = "0.1.2"
 
   private def emitted(m: => Module) =
     new Emission(version).emit(m.elaborateDesign())

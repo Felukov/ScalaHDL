@@ -49,7 +49,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
     val toDrive = Out(UInt(8))
     val toHost  = Out(UInt(8))
 
-    given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+    given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
 
     val buffer = BlockRam(24, UInt(8))
     val drive  = buffer.readSync(rd, ReadFirst, ready)
@@ -73,7 +73,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val clk  = In(Clock())
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         val q = mem.readSync(addr, ReadFirst)
         out := q
@@ -89,7 +89,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val tick = In(Bool())
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         var taken: Option[DslSignal] = None
         when(en) { when(tick) { val q = mem.readSync(addr, ReadFirst); taken = Some(q) } }
@@ -104,7 +104,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val a, e = In(Bool())
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         var taken: Option[DslSignal] = None
         when(a) { val q = mem.readSync(addr, ReadFirst, e); taken = Some(q) }
@@ -119,7 +119,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val sel  = In(UInt(2))
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         var taken: Option[DslSignal] = None
         switch(sel) {
@@ -140,7 +140,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         val q = mem.readSync(addr, WriteFirst, e)
         mem.write(addr, data, we)
@@ -157,7 +157,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val raddr, waddr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         val q = mem.readSync(raddr, Undefined, e)
         mem.write(waddr, data, we)
@@ -175,7 +175,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val sel  = In(UInt(2))
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = BlockRam(16, UInt(8))
         var taken: Option[DslSignal] = None
         switch(sel) {
@@ -195,7 +195,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val e    = In(Bool())
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = LutRam(16, UInt(8))
         val q = mem.readAsync(addr, ReadFirst, e)
         out := q
@@ -211,7 +211,7 @@ class MemoryReadScopeSuite extends munit.FunSuite:
         val a    = In(Bool())
         val addr = In(UInt(4))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val mem = LutRam(16, UInt(8))
         var taken: Option[DslSignal] = None
         when(a) { val q = mem.readAsync(addr, ReadFirst); taken = Some(q) }

@@ -216,7 +216,7 @@ provable from their signature) was considered and rejected as too much ceremony 
 `Reg`, `Wire` and `Fsm` take an optional `domain`:
 
 ```scala
-given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)  // what a bare Reg gets
+given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)  // what a bare Reg gets
 
 val count       = Reg(UInt(10), init = 0, domain = asyncReset)
 val write_phase = Reg(UInt(2),  init = 0, domain = syncReset)
@@ -1484,8 +1484,8 @@ port.mem <> memory.client                     // every leaf, checked
   itself with its fields typed, a `Vec` of bundles to its typed handle, an encoding (R24) to a
   signal that carries it. A user's interface never names the pair; a generic one — `Handshake`,
   `Flow` — carries it as `(using Blueprint[P, H])`, which is what lets `payload` come back as the
-  bundle when the payload is one. A nested interface is declared with `Master`/`Slave`, and its
-  role composes with the endpoint's: a slave's slave reads as written.
+  bundle when the payload is one. A nested interface — one, or a `Vec` of them — is declared with
+  `Master`/`Slave`, and its role composes with the endpoint's: a slave's slave reads as written.
 - **The field's `val` is the port.** The fields are made while the class body runs, before the
   endpoint has a name; the endpoint declaration then allocates one port per leaf *onto* the handle
   the field already holds, so it is the port's one handle and everything R23 does to a port at
@@ -1525,6 +1525,12 @@ port.mem <> memory.client                     // every leaf, checked
   val client = Slave(Vec(4, MemAccess()))   // client_0_req_valid, … client_3_rsp_payload
   screen.mem <> client(0)
   ```
+- **The same spelling nests.** Inside an interface, `val lane = Slave(Vec(2, Lane()))` is `n`
+  nested fields named `<field>_<k>`; under an endpoint `io` their ports are `io_lane_0_…`, and
+  `<>` walks them exactly as it walks a single nested interface. The elements come back as an
+  `IndexedSeq`, each a fresh interface and an ordinary nested endpoint once bound. Nothing
+  downstream distinguishes the nested `Vec` from the `n` fields it names: `bind`, `shape`, and
+  `<>` see the expansion, not the declaration form.
 - **`<>` connects two endpoints of one shape, leaf by leaf, from the side this module reads to the
   side it drives.** In the connecting module every leaf is one of two things: *driven here* — an
   output of its own, or an input of a child — or *read here* — an input of its own, or an output of
@@ -3625,7 +3631,7 @@ to a heading and a summary.
 | R29 | The logic-level report | The logic-level report: `<Module>.levels.rpt` and a design roll-up, hops and weighted cells, model and assumptions printed, never a timing result |
 | R30 | A register slice | A register slice: `scalahdl.lib.Skid`, two stages behind R8 endpoints, registered outputs, no ready chain, `clear`, `empty`, `enable` |
 | R27 | A block that exists only in simulation | A block that exists only in simulation: `simOnly { check(cond, msg) }` inside `// synthesis translate_off`, one block per clock, reset-guarded by the domain, and nothing inside may become part of the design |
-| R31 | Interface | Interface: a named group of ports whose directions are written once, from the master's side; `Master`/`Slave` endpoints, `Vec` for n of them, fields bound onto their handles, extension for a shared half, `<>` from the side read here to the side driven here |
+| R31 | Interface | Interface: a named group of ports whose directions are written once, from the master's side; `Master`/`Slave` endpoints, `Vec` for n of them at an endpoint or nested, fields bound onto their handles, extension for a shared half, `<>` from the side read here to the side driven here |
 | R31.1 | An interface states its protocol | An interface states its protocol beside its fields; each endpoint emits it as simulation-only checks |
 | R32 | A synchronous FIFO | `scalahdl.lib.SyncFifo`: a same-domain queue of `depth` words between two endpoints, no ready chain |
 | R34 | A runtime selection on a packed bit-vector | A runtime selection on a packed bit-vector: `word(idx)` and `word(idx, w)` emit Verilog's `word[i]` and `word[i +: w]`; a window is a register-only assignment target (R6.7) |

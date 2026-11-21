@@ -60,9 +60,11 @@ def Vec[B <: Bundle](n: Int)(factory: => B): BundleVec[B] = Vec(n, factory)
   * everywhere — *n of these, named `_0` to `_n-1`* — and the names it puts on
   * the pins are the ones R14.1 already gives a port `Vec`.
   *
-  * Its use is a module that faces `n` of something: an arbiter, a crossbar, a
-  * fan-out. Each element is an ordinary endpoint once bound, so `<>` connects
-  * one of them exactly as it connects any other.
+  * Its use is a module or an interface that faces `n` of something: an
+  * arbiter, a crossbar, a fan-out. At a module's top level, `Master(Vec(n, i))`
+  * gives `n` endpoints; inside an `Interface`, `Master(Vec(n, i))` gives `n`
+  * nested fields named `<field>_<k>`. Each element is an ordinary endpoint
+  * once bound, so `<>` connects one of them exactly as it connects any other.
   *
   * A fresh interface per element, as R14 requires of a `Vec` of bundles and
   * for a sharper reason: an `Interface` may be bound once, so sharing one

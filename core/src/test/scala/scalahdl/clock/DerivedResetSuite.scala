@@ -46,7 +46,7 @@ class DerivedResetSuite extends munit.FunSuite:
     val hard = In(Reset(ActiveHigh))
     val cmd  = In(Bool())
     val out  = Out(UInt(8))
-    given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+    given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
     val derived = Wire(Reset(polarity))
     derived := (cmd | hard.asserted).asReset(polarity)
     private val derivedDomain = ClockDomain(clk, derived, ResetKind.Async, polarity)
@@ -79,7 +79,7 @@ class DerivedResetSuite extends munit.FunSuite:
         val clk = In(Clock())
         val a   = In(Bool())
         val out = Out(Bool())
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Wire(Reset(ActiveHigh))
         r := a.asReset(ActiveHigh)
         out := r.asserted
@@ -93,7 +93,7 @@ class DerivedResetSuite extends munit.FunSuite:
         val clk = In(Clock())
         val a   = In(Bool())
         val out = Out(Bool())
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Wire(Reset(ActiveLow))
         r := a.asReset(ActiveLow)
         out := r.asserted
@@ -110,7 +110,7 @@ class DerivedResetSuite extends munit.FunSuite:
         val hard = In(Reset(ActiveHigh))
         val cmd  = In(Bool())
         val out  = Out(UInt(16))
-        given clocking: ClockDomain = ClockDomain(clk, hard, ResetKind.Async, ActiveHigh)
+        given defaultDomain: ClockDomain = ClockDomain(clk, hard, ResetKind.Async, ActiveHigh)
         val derived = Wire(Reset(ActiveHigh))
         derived := (cmd | hard.asserted).asReset(ActiveHigh)
         private val derivedDomain = ClockDomain(clk, derived, ResetKind.Async, ActiveHigh)
@@ -131,7 +131,7 @@ class DerivedResetSuite extends munit.FunSuite:
         val clk = In(Clock())
         val w   = In(UInt(8))
         val out = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Wire(Reset(ActiveHigh))
         r := w.asReset(ActiveHigh)
         out := w
@@ -145,7 +145,7 @@ class DerivedResetSuite extends munit.FunSuite:
       (new Module:
         val clk = In(Clock())
         val out = Out(Bool())
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Wire(Reset(ActiveHigh))
         r := 1.asReset(ActiveHigh)
         out := r.asserted

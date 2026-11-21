@@ -39,6 +39,7 @@ so editing an example cannot fail the emitter's contract.
 | [`CpuAddressMap.scala`](src/main/scala/scalahdl/examples/CpuAddressMap.scala) | An instance array in front of the bridge, decoded by an address map with `parallelCase` |
 | [`CpuMaps.scala`](src/main/scala/scalahdl/examples/CpuMaps.scala) | A generator is a function: the same two decode `def`s reused by two designs that share no supertype or parameter |
 | [`CpuUtils.scala`](src/main/scala/scalahdl/examples/CpuUtils.scala) | Design-level helpers over a bus, and the difference between a helper that **declares** a `Vec` and one that drives the caller's |
+| [`FlowExample.scala`](src/main/scala/scalahdl/examples/FlowExample.scala) | The SpinalHDL `val io = new Bundle { ... }` shape: a module's ports grouped under one `io` endpoint (R31), with a `Flow` request/answer and a two-state echo machine |
 
 [`Emit.scala`](src/main/scala/scalahdl/examples/Emit.scala) is not an example:
 it is the command-line generator that `./emit.sh` runs to elaborate any

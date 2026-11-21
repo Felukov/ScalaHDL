@@ -13,7 +13,7 @@ import scalahdl.core.{Direction, Type}
 class HandshakeSuite extends munit.FunSuite:
 
   private def emit(top: Module): String =
-    new VerilogEmitter("0.1.1").emitModule(top.elaborateDesign().top, "Top")
+    new VerilogEmitter("0.1.2").emitModule(top.elaborateDesign().top, "Top")
 
   test("master and slave endpoints have complementary ports, named by the val"):
     class Top extends Module:
@@ -33,7 +33,7 @@ class HandshakeSuite extends munit.FunSuite:
     ))
 
     // A slave passed through to a master: data forward, ready back.
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     assert(v.contains("out_valid = in_valid;"), v)
     assert(v.contains("out_payload = in_payload;"), v)
     assert(v.contains("in_ready = out_ready;"), v)
@@ -137,7 +137,7 @@ class HandshakeSuite extends munit.FunSuite:
       "producer" -> List("out_valid", "out_ready", "out_payload"),
       "consumer" -> List("in_valid", "in_ready", "in_payload")))
 
-    val v = new VerilogEmitter("0.1.1").emitModule(top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(top, "Top")
     assert(v.contains(".out_ready(consumer_in_ready)"), v)
     assert(v.contains(".in_valid(producer_out_valid)"), v)
     assert(v.contains(".in_payload(producer_out_payload)"), v)

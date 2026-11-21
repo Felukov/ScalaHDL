@@ -502,7 +502,7 @@ final class VerilogEmitter(version: String, vendor: Option[Vendor] = None):
           // The same fall-through covers a reset kind that names no reset
           // signal: nothing to be sensitive to, nothing to branch on.
           (db.domain.rstName, sig.init) match
-            case (Some(rst), Some(_)) =>
+            case (Some(rst), Some(init)) =>
               val edge = kind match
                 case ResetKind.Async =>
                   db.domain.polarity match
@@ -515,7 +515,7 @@ final class VerilogEmitter(version: String, vendor: Option[Vendor] = None):
               // The reset is the first link of the chain, so a body that is
               // one `when` continues it as `end else if` (R12.2).
               sb.append(s"  always @(posedge $clk$edge) begin\n")
-              sb.append(emitIf(cond, s"      ${sig.name} <= ${emitInit(sig, ctx)};",
+              sb.append(emitIf(cond, resetBody(sig, init, assign, ctx),
                                db.stmts, indent = 4, assign, ctx))
               sb.append("\n  end\n")
             case _ =>
@@ -570,30 +570,57 @@ final class VerilogEmitter(version: String, vendor: Option[Vendor] = None):
     sb.append("  // synthesis translate_on\n")
     sb.toString
 
-  /** Emit the reset value for a register, or 0 if none (R13: a register with
-    * no `init` in a reset domain is simply not reset — this is only reached
-    * when `init` is defined). */
-  private def emitInit(sig: Signal, ctx: EmitCtx): String =
-    sig.init match
-      case Some(e) => emitExpr(e, ctx)
-      case None    => literalZero(sig.typeOf)
+  /** R13 / R14.1 — the reset value as Verilog statements, one per net the
+    * register was declared as. A scalar register is one net and one line. An
+    * aggregate is one net per leaf (R14.1) and has no single declaration to
+    * carry a packed value, so each leaf takes the bits of that value that
+    * R07.2's layout gives it.
+    *
+    * The value must be an elaboration-time constant: a leaf takes its bits as
+    * a literal, and Verilog bit-selects a name rather than an expression
+    * (R6.2). So an aggregate register with a computed reset value has no
+    * Verilog form, and that is reported rather than emitted. */
+  private def resetBody(sig: Signal, init: Expr, assign: String,
+                        ctx: EmitCtx): String =
+    val pad = " " * 6
+    sig.typeOf match
+      case aggregate @ (Type.Bundle(_) | Type.Vec(_, _)) =>
+        val packed = ExprConst.bits(init, ctx.typeOf).getOrElse(
+          throw EmitterError(
+            s"`${sig.name}` is an aggregate register whose reset value is not a constant; " +
+            "declare its fields as scalar registers"))
+        val ranges = leafRanges(aggregate)
+        leafPaths(aggregate).map { case (_, steps) =>
+          val (hi, lo) = ranges(steps)
+          val width = hi - lo + 1
+          val value = (packed >> lo).mod(BigInt(1) << width)
+          s"$pad${renderPath(sig.id, steps, ctx)} $assign ${emitLit(value, width, false)};"
+        }.mkString("\n")
+      case _ => s"$pad${sig.name} $assign ${emitExpr(init, ctx)};"
 
-  private def literalZero(t: Type): String = t match
-    case Type.Bool    => "1'b0"
-    case Type.UInt(w) => s"${w}'d0"
-    case Type.SInt(w) => s"${w}'sd0"
-    case Type.Bits(w) => s"${w}'d0"
-    case Type.GrayCode(w) => s"${w}'d0"
-    case Type.Clock    => "1'b0"
-    case Type.Reset(_) => "1'b0"
-    case Type.Bundle(fields) =>
-      // R07.2 packing: first field in MSBs. Concatenate per-leaf zeros in
-      // declaration order.
-      val parts = fields.map { case (_, ft) => literalZero(ft) }
-      "{" + parts.mkString(", ") + "}"
-    case Type.Vec(n, elem) =>
-      // R07.2: Vec packs descending (n-1 high). Concatenate n zeros.
-      "{" + List.fill(n)(literalZero(elem)).mkString(", ") + "}"
+  /** R07.2 — the bit range each scalar leaf occupies in the packed aggregate.
+    * The first field sits in the most significant bits and a `Vec` packs
+    * descending: the layout [[leafPaths]] walks and `unpackBits` cuts. */
+  private def leafRanges(t: Type): Map[List[PathStep], (Int, Int)] =
+    def walk(t: Type, hi: Int): (Map[List[PathStep], (Int, Int)], Int) = t match
+      case Type.Bundle(fields) =>
+        fields.foldLeft((Map.empty[List[PathStep], (Int, Int)], hi)) {
+          case ((ranges, cursor), (name, fieldType)) =>
+            val (sub, next) = walk(fieldType, cursor)
+            (ranges ++ sub.map { case (steps, range) =>
+              (PathStep.Field(name) :: steps, range) }, next)
+        }
+      case Type.Vec(n, elem) =>
+        (n - 1 to 0 by -1).foldLeft((Map.empty[List[PathStep], (Int, Int)], hi)) {
+          case ((ranges, cursor), i) =>
+            val (sub, next) = walk(elem, cursor)
+            (ranges ++ sub.map { case (steps, range) =>
+              (PathStep.Index(Expr.uint(BigInt(i), 32)) :: steps, range) }, next)
+        }
+      case scalar =>
+        (Map(List.empty[PathStep] -> (hi, hi - scalar.bitWidth + 1)),
+         hi - scalar.bitWidth)
+    walk(t, t.bitWidth - 1)._1
 
   /** Emit a statement list, one statement after another at `indent` (R12:
     * order and nesting preserved exactly). Each statement carries its own

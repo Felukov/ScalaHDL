@@ -77,6 +77,18 @@ abstract class Interface:
   protected inline def Slave[I <: Interface](i: => I): I =
     nested(Source.capture, Role.Slave, i)
 
+  /** `val lane = Slave(Vec(2, Lane()))` — n nested interfaces, as written.
+    * Each element is an ordinary nested field named `<field>_<index>`, which
+    * is the name R14.1 gives a port `Vec`'s elements and the name `bind`
+    * extends with the endpoint's own prefix. The elements are a fresh
+    * interface each, exactly as [[InterfaceVec]] requires. */
+  protected inline def Master[I <: Interface](v: InterfaceVec[I]): IndexedSeq[I] =
+    nestedVec(Source.capture, Role.Master, v)
+
+  /** The mirror image of [[Master]]'s `Vec` overload. */
+  protected inline def Slave[I <: Interface](v: InterfaceVec[I]): IndexedSeq[I] =
+    nestedVec(Source.capture, Role.Slave, v)
+
   private def leaf[P, H](src: Source, written: Direction, p: => P)
                         (using b: Blueprint[P, H]): H =
     val name = fieldName(src)
@@ -91,6 +103,23 @@ abstract class Interface:
     val sub = i
     _fields += Nested(name, role, sub)
     sub
+
+  /** A nested `Vec` is `n` nested fields, in the order the `Vec` holds them.
+    *
+    * Expanding rather than adding a third field kind is what keeps every
+    * downstream rule unchanged: `bind` prefixes each element's ports, `shape`
+    * records it as a nested sub-shape, and `<>` recurses into it exactly as it
+    * recurses into a single nested interface. The alternative — one field with
+    * a list of sub-shapes — would need a second spelling in all three. With
+    * expansion, the names are R14.1's: `client_0`, `client_1`, and under an
+    * endpoint `io`, `io_client_0_req_valid`. */
+  private def nestedVec[I <: Interface](src: Source, role: Role,
+                                        v: InterfaceVec[I]): IndexedSeq[I] =
+    val name = fieldName(src)
+    v.elements.zipWithIndex.foreach { case (sub, index) =>
+      _fields += Nested(s"${name}_$index", role, sub)
+    }
+    v.elements
 
   private def fieldName(src: Source): String = src.name.getOrElse(
     throw ElabError(

@@ -43,7 +43,7 @@ trait GoldenCorpus extends munit.FunSuite:
 
   /** The version the R20.2 header carries. Every checked-in golden carries the
     * build's own version in its header. */
-  protected final val version: String = "0.1.1"
+  protected final val version: String = "0.1.2"
 
   /** The directory holding this module's golden corpus, relative to the working
     * directory sbt runs the tests from. */

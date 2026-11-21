@@ -74,7 +74,7 @@ class IRShapeSuite extends munit.FunSuite:
   test("emitter does not mutate the IR (hash before/after unchanged)"):
     val design = (new Fix).elaborateDesign()
     val before = design.hashCode()
-    val emitter = new VerilogEmitter("0.1.1")
+    val emitter = new VerilogEmitter("0.1.2")
     emitter.emitModule(design.top, "Fix")
     emitter.emitModule(design.top, "Fix")
     val after = design.hashCode()
@@ -131,7 +131,7 @@ class IRShapeSuite extends munit.FunSuite:
       }
     val design = (new Fsm).elaborateDesign()
     val before = design.hashCode()
-    val emitter = new VerilogEmitter("0.1.1")
+    val emitter = new VerilogEmitter("0.1.2")
     emitter.emitModule(design.top, "Fsm")
     emitter.emitModule(design.top, "Fsm")
     assertEquals(design.hashCode(), before, "IR hash must be unchanged by emission")

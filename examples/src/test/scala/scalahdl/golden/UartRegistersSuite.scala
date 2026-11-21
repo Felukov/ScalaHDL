@@ -14,7 +14,7 @@ import scalahdl.examples.{UartRegs, UartRegisters, UartRegistersByHand}
 class UartRegistersSuite extends munit.FunSuite:
 
   private def body(module: Module): String =
-    val emitted = new Emission("0.1.1")
+    val emitted = new Emission("0.1.2")
       .emit(module.elaborateDesign(), "scalahdl.examples." + module.getClass.getSimpleName)
     emitted.files.head._2.replace(module.moduleName, "M")
 

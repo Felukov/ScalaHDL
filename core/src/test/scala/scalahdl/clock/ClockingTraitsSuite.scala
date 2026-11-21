@@ -39,7 +39,7 @@ class ClockingTraitsSuite extends munit.FunSuite:
       cnt := cnt + 1.U(8)
       count := cnt
     val design = (new Counter).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Counter")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Counter")
     assert(v.contains("negedge rst_n"),
       s"SingleClock should be async active-low: $v")
 
@@ -66,6 +66,6 @@ class ClockingTraitsSuite extends munit.FunSuite:
     assert(design.top.signals.exists(_.name == "rB"),
       s"rB should be in signals: ${design.top.signals.map(_.name)}")
     // Check the emitted Verilog has two different sensitivity lists
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Dual")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Dual")
     assert(v.contains("clkA"), s"should reference clkA: $v")
     assert(v.contains("clkB"), s"should reference clkB: $v")

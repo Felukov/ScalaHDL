@@ -29,7 +29,7 @@ class NestedModulesSuite extends munit.FunSuite:
       "NestedBranch_i1" -> List("NestedLeaf_i2", "NestedLeaf_i3")
     ))
 
-    val emitted = new Emission("0.1.1")
+    val emitted = new Emission("0.1.2")
       .emit(design, "scalahdl.examples.NestedModules")
     assertEquals(emitted.files.map(_._1), expectedFiles)
     assertEquals(emitted.manifest, expectedFiles.mkString("\n") + "\n")

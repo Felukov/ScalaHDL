@@ -43,7 +43,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
     val data = In(UInt(8))
     val out  = Out(UInt(8))
 
-    given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+    given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
 
     val ram = Registers(20, UInt(8))
     val rd = ram.readAsync(addr, ReadFirst)
@@ -63,7 +63,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -80,7 +80,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -96,7 +96,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -114,7 +114,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -133,7 +133,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -153,7 +153,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -173,7 +173,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd
@@ -196,7 +196,7 @@ class MemoryWriteScopeSuite extends munit.FunSuite:
         val addr = In(UInt(4))
         val data = In(UInt(8))
         val out  = Out(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val ram = Registers(16, UInt(8))
         val rd = ram.readAsync(addr, ReadFirst)
         out := rd

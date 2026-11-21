@@ -12,7 +12,7 @@ import scalahdl.emit.VerilogEmitter
 final class InterfaceSuite extends munit.FunSuite:
 
   private def emit(top: Module): String =
-    new VerilogEmitter("0.1.1").emitModule(top.elaborateDesign().top, "Top")
+    new VerilogEmitter("0.1.2").emitModule(top.elaborateDesign().top, "Top")
 
   private def ports(top: Module): List[(String, Direction, Type)] =
     top.elaborateDesign().top.ports.map(p => (p.name, p.direction, p.typeOf))
@@ -173,7 +173,7 @@ final class InterfaceSuite extends munit.FunSuite:
 
     val top = (new Top).elaborateDesign().top
     assertEquals(top.drivers.size, 3)
-    val v = new VerilogEmitter("0.1.1").emitModule(top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(top, "Top")
     assert(v.contains("m_valid = s_valid;"), v)
     assert(v.contains("m_payload = s_payload;"), v)
     assert(v.contains("s_ready = m_ready;"), v)
@@ -413,6 +413,56 @@ final class InterfaceSuite extends munit.FunSuite:
       new Top
 
     assert(error.getMessage.contains("already declared as `client_0`"), error.getMessage)
+
+  // ---- a Vec of interfaces as a nested field
+
+  /** One channel of a bank: a word and a strobe. */
+  final case class Lane() extends Interface:
+    val word = Out(Word())
+    val strobe = In(Bool())
+
+  /** A bank whose channels are a nested `Vec` rather than one field each. */
+  final case class Bank() extends Interface:
+    val lane = Slave(Vec(2, Lane()))
+    val ready = Out(Bool())
+
+  final class BankOf(v: InterfaceVec[Lane]) extends Interface:
+    val lane = Slave(v)
+
+  test("a nested Vec is n nested fields, named `<field>_<index>`"):
+    class Top extends Module:
+      val bank = Master(Bank())
+      bank.lane(0).strobe := True
+      bank.lane(1).strobe := False
+      bank.ready := True
+
+    assertEquals(ports(new Top), List(
+      ("bank_lane_0_word", Direction.In, wordType),
+      ("bank_lane_0_strobe", Direction.Out, Type.Bool),
+      ("bank_lane_1_word", Direction.In, wordType),
+      ("bank_lane_1_strobe", Direction.Out, Type.Bool),
+      ("bank_ready", Direction.Out, Type.Bool)))
+
+  test("a nested Vec connects leaf by leaf, like any other nested endpoint"):
+    class Top extends Module:
+      val s = Slave(Bank())
+      val m = Master(Bank())
+      s <> m
+
+    val v = emit(new Top)
+    assert(v.contains("s_lane_0_word_addr = m_lane_0_word_addr;"), v)
+    assert(v.contains("m_lane_0_strobe = s_lane_0_strobe;"), v)
+    assert(v.contains("s_lane_1_word_write = m_lane_1_word_write;"), v)
+    assert(v.contains("m_ready = s_ready;"), v)
+
+  test("a nested Vec keeps the fresh-element rule: one instance cannot be n fields"):
+    val error = intercept[ElabError]:
+      class Top extends Module:
+        val shared = Lane()
+        val bank = Master(BankOf(Vec(2, shared)))
+      new Top
+
+    assert(error.getMessage.contains("already declared as `bank_lane_0`"), error.getMessage)
 
   test("an interface that is not an endpoint cannot be connected"):
     val error = intercept[ElabError]:

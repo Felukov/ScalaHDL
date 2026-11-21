@@ -1,6 +1,27 @@
 # Changelog
 
 
+## 0.1.2 — 2026-11-21
+
+
+- Groups a module's ports under an `io` endpoint, the ScalaHDL spelling of
+  SpinalHDL's `val io = new Bundle { ... }`. An `Interface` writes each
+  direction once; `val io = Master(...)` makes the group the module's ports,
+  flattened as `io_request_valid`, `io_answer_payload`, and so on. The new
+  `FlowExample` translates the SpinalHDL request/answer example, and the
+  howto records the mapping.
+- An interface may nest a `Vec` of interfaces:
+  `val lane = Slave(Vec(2, Lane()))` declares `lane_0_*` and `lane_1_*`,
+  returns the elements as an `IndexedSeq`, and `<>` connects them like any
+  other nested endpoint.
+- Fixes an aggregate register's reset. A `Bundle` or `Vec` register is
+  emitted as one net per leaf, so each leaf now takes the bits of the reset
+  value that R07.2's layout gives it, and the reset branch no longer names a
+  record no module declares. A reset value that is not an elaboration-time
+  constant is refused, because a leaf's bits are selected from a name.
+- [`hdl-spec.md`](hdl-spec.md) states nested interface `Vec`s in R31, and the
+  `FlowExample` and howto section document the `io` grouping.
+
 ## 0.1.1 — 2026-11-01
 
 

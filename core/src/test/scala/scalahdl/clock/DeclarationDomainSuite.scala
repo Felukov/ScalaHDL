@@ -111,7 +111,7 @@ class DeclarationDomainSuite extends munit.FunSuite:
       val count = Reg(UInt(8), init = 0, domain = slow)
       count := count + 1
       q := count
-    val emitter = new VerilogEmitter("0.1.1")
+    val emitter = new VerilogEmitter("0.1.2")
     // The emitted module name comes from the class (R16), so only that one
     // token may differ — the claim is that the *design* is byte for byte the
     // same however the domain was said.

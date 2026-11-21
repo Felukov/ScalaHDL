@@ -23,7 +23,7 @@ class DecodeSuite extends munit.FunSuite:
       for j <- 0 until 4 do
         o(j) := sel(j)
     val design = (new Top).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     // sel is an internal Vec[Bool] → struct-of-arrays: sel [0:3].
     assert(v.contains("sel [0:3]"), s"sel should be a struct-of-arrays: $v")
     // Each element: sel(j) := (i === j). Emits should contain i == 0/3.
@@ -42,7 +42,7 @@ class DecodeSuite extends munit.FunSuite:
       val q = Out(UInt(8))
       q := outs(i)
     val design = (new Top).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Top")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Top")
     // R2: Mux is an anonymous expression and must not invent a declaration.
     assert(v.contains("? x : d"), s"Mux should emit inline at each explicit assignment: $v")
     assert(!v.contains("wire [7:0] mux"), s"Mux must not invent hidden signals (R2): $v")

@@ -3,7 +3,7 @@
 
 ThisBuild / scalaVersion := "3.3.8"
 ThisBuild / organization := "scalahdl"
-ThisBuild / version      := "0.1.1"
+ThisBuild / version      := "0.1.2"
 
 // SemanticDB paths are relative to a source root, and sbt names only the
 // output directory. Without this, the compiler takes the source root from the

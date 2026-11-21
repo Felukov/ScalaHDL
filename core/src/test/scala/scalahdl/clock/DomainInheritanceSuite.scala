@@ -76,7 +76,7 @@ class DomainInheritanceSuite extends munit.FunSuite:
       withClock(ClockDomain(slowClk, slowRst_n, ResetKind.Async, ActiveLow)):
         val u = inst(new SlowUnit())
     val design = (new Parent).elaborateDesign()
-    val v = new VerilogEmitter("0.1.1").emitModule(design.top, "Parent")
+    val v = new VerilogEmitter("0.1.2").emitModule(design.top, "Parent")
     assert(v.contains("SlowUnit u("),
       s"should emit module instantiation: $v")
     assert(v.contains(".clk(slowClk)"),

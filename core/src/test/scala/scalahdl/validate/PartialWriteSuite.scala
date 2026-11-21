@@ -51,7 +51,7 @@ class PartialWriteSuite extends munit.FunSuite:
     val latch   = In(UInt(16))
     val count   = Out(UInt(16))
 
-    given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+    given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
 
     val counter = Reg(UInt(16), powerUp = 0x5550)
     when(en) {
@@ -85,7 +85,7 @@ class PartialWriteSuite extends munit.FunSuite:
     val d    = In(Bool())
     val q    = Out(UInt(8))
 
-    given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+    given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
 
     val r = Reg(UInt(8), powerUp = 0)
     r(7, 7) := d      // a window of one
@@ -111,7 +111,7 @@ class PartialWriteSuite extends munit.FunSuite:
     val cat  = Out(UInt(12))
     val res  = Out(UInt(16))
 
-    given clocking: ClockDomain = scalahdl.clock.ClockDomain.noClock
+    given defaultDomain: ClockDomain = scalahdl.clock.ClockDomain.noClock
 
     wide := a(15, 8)
     sum  := a(7, 0) + a(15, 8)
@@ -131,7 +131,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val a = In(UInt(16))
         val q = Out(Bool())
-        given clocking: ClockDomain = scalahdl.clock.ClockDomain.noClock
+        given defaultDomain: ClockDomain = scalahdl.clock.ClockDomain.noClock
         q := a(15, 8)(0)
       .elaborateDesign()
     }
@@ -142,7 +142,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val clk = In(Clock())
         val d = In(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Reg(UInt(16), powerUp = 0)
         r(0, 7) := d
       .elaborateDesign()
@@ -156,7 +156,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val d = In(UInt(8))
         val q = Out(UInt(16))
-        given clocking: ClockDomain = scalahdl.clock.ClockDomain.noClock
+        given defaultDomain: ClockDomain = scalahdl.clock.ClockDomain.noClock
         val w = Wire(UInt(16))
         w(7, 0) := d
         q := w
@@ -171,7 +171,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val clk = In(Clock())
         val d = In(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Reg(UInt(8), powerUp = 0)
         r(15, 8) := d
     }
@@ -184,7 +184,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val clk = In(Clock())
         val d = In(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val v = Reg(Vec(4, UInt(16)))
         v(2)(7, 0) := d
     }
@@ -198,7 +198,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val clk = In(Clock())
         val d = In(UInt(16))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Reg(UInt(16), powerUp = 0)
         r(7, 0) := d
     }
@@ -210,7 +210,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val clk = In(Clock())
         val q = Out(UInt(16))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val r = Reg(UInt(16), powerUp = 0)
         r(7, 0) := 0xff
         q := r
@@ -228,7 +228,7 @@ class PartialWriteSuite extends munit.FunSuite:
       new Module:
         val clk = In(Clock())
         val d = In(UInt(8))
-        given clocking: ClockDomain = ClockDomain(clk, ResetKind.None)
+        given defaultDomain: ClockDomain = ClockDomain(clk, ResetKind.None)
         val f = Reg(new Framed)
         f.body(7, 0) := d
         f.head := d
@@ -244,7 +244,7 @@ class PartialWriteSuite extends munit.FunSuite:
         val rst = In(Reset(ActiveHigh))
         val d = In(UInt(8))
         val q = Out(UInt(16))
-        given clocking: ClockDomain =
+        given defaultDomain: ClockDomain =
           ClockDomain(clk, rst, ResetKind.Sync, ActiveHigh)
         val r = Reg(UInt(16), init = 0)
         r(7, 0) := d
